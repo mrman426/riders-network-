@@ -1,10 +1,13 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ✅ YOUR REAL KEYS
+// 🔑 YOUR KEYS
 const supabaseUrl = "https://qxqtqiwcwnnkbpkhenyj.supabase.co";
 const supabaseKey = "sb_publishable_P49Tk395y5TEhFbUdYa4KQ_VrfAh0gD";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// 👑 ADMIN
+const ADMIN_EMAIL = "toiletwerlpoolcake@gmail.com";
 
 let currentUser = null;
 
@@ -65,6 +68,8 @@ async function loadRides() {
   div.innerHTML = "";
 
   data.forEach(r => {
+    const isAdmin = currentUser?.email === ADMIN_EMAIL;
+
     div.innerHTML += `
       <div class="box">
         📍 ${r.location}<br>
@@ -72,9 +77,12 @@ async function loadRides() {
         👤 ${r.user}<br>
         👥 Joined: ${(r.joined || []).length}
         <br><br>
+
         <button onclick='joinRide("${r.id}", ${JSON.stringify(r).replace(/"/g,"&quot;")})'>
           Join Ride
         </button>
+
+        ${isAdmin ? `<button onclick="deleteRide('${r.id}')">🗑 Delete</button>` : ""}
       </div>
     `;
   });
@@ -100,5 +108,47 @@ window.joinRide = async (id, ride) => {
   loadRides();
 };
 
-// Load rides on start
+// 🗑 DELETE RIDE (ADMIN ONLY)
+window.deleteRide = async (id) => {
+  if (currentUser.email !== ADMIN_EMAIL) {
+    return alert("Not admin");
+  }
+
+  await supabase.from("rides").delete().eq("id", id);
+  loadRides();
+};
+
+// 💬 SEND MESSAGE
+window.sendMessage = async () => {
+  if (!currentUser) return alert("Login first");
+
+  const text = document.getElementById("chatInput").value;
+
+  await supabase.from("messages").insert({
+    text,
+    user: currentUser.email
+  });
+
+  document.getElementById("chatInput").value = "";
+  loadMessages();
+};
+
+// 💬 LOAD MESSAGES
+async function loadMessages() {
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  const div = document.getElementById("chat");
+  div.innerHTML = "";
+
+  data.forEach(m => {
+    div.innerHTML += `<div><b>${m.user}:</b> ${m.text}</div>`;
+  });
+}
+
+// 🔄 AUTO REFRESH
+setInterval(loadMessages, 2000);
+loadMessages();
 loadRides();
