@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Riders Network</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🏍 Riders Network</h1>
+
+<div class="box">
+  <h3>Login</h3>
+  <input id="email" placeholder="email">
+  <input id="password" type="password" placeholder="password">
+  <br>
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="box">
+  <h3>Create Ride</h3>
+  <input id="location" placeholder="Location">
+  <input id="level" placeholder="Level">
+  <br>
+  <button onclick="createRide()">Create Ride</button>
+</div>
+
+<div class="box">
+  <h3>Rides</h3>
+  <div id="rides"></div>
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
